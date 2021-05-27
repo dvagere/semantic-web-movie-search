@@ -1,11 +1,12 @@
+import axios from 'axios';
+
+import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
+import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import FormControl from "@material-ui/core/FormControl";
-import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
-
 import SearchIcon from "@material-ui/icons/SearchOutlined";
-import { Button } from "@material-ui/core";
 
 interface Props {
 
@@ -13,8 +14,50 @@ interface Props {
 
 const Home:React.FC<Props> = (props) => {
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
 
+    const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
+      PREFIX dbo: <http://dbpedia.org/ontology/>
+      PREFIX dbp: <http://dbpedia.org/ontology/>
+      PREFIX dbt: <http://dbpedia.org/ontology/>
+      SELECT DISTINCT ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
+      WHERE {
+        {
+          ?x rdf:type dbpediaOnto:Film.
+          ?x rdfs:label ?label.
+          ?x dbo:abstract ?abstract;
+              dbo:thumbnail ?thumbnail;
+              dbo:runtime ?runtime;
+              dbo:producer ?producer;
+              dbp:writer ?writer.
+          ?producer rdfs:label ?producer_name.
+        }
+
+        UNION
+        {
+          ?x rdf:type dbpediaOnto:Movie.
+          ?x rdfs:label ?label.
+          ?x dbo:abstract ?abstract;
+              dbo:thumbnail ?thumbnail;
+              dbo:runtime ?runtime;
+              dbo:producer ?producer;
+              dbp:writer ?writer.
+          ?producer rdfs:label ?producer_name.
+        }
+        FILTER( REGEX(STR(?label),"Love") )
+        FILTER(LANGMATCHES(LANG(?label), "en"))
+        FILTER(LANGMATCHES(LANG(?producer_name), "en"))
+        FILTER(LANGMATCHES(LANG(?abstract), "en"))
+      }
+      LIMIT 5
+    `
+    await axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
+    .then(response => {
+      console.log(">>>>>>>>>> Response: ", response);
+    })
+    .catch(error => {
+      console.log("<<<<<<<<<< Error: ", error);
+    });
   }
 
   const handleMouseDownPassword = (event: any) => {
