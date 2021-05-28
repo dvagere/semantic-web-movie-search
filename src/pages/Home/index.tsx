@@ -8,7 +8,6 @@ import Typography from "@material-ui/core/Typography";
 import FormControl from "@material-ui/core/FormControl";
 import SearchIcon from "@material-ui/icons/SearchOutlined";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import AppStateContext from '../../ContextApi/AppStateContext';
 import DispatchContext from '../../ContextApi/DispatchContext';
 import { useHistory } from 'react-router';
 import Page from '../../layouts/Page';
@@ -22,11 +21,12 @@ const Home:React.FC<Props> = (props) => {
   const history = useHistory();
   const [ queryString, setQueryString ] = React.useState<string>("");
 
-  const { SearchState } = React.useContext(AppStateContext)
   const { SearchDispatcher } = React.useContext(DispatchContext)
 
-  console.log("Search: ", SearchState);
-  const handleSearch = async () => {
+  const handleSearch = () => {
+
+    SearchDispatcher({type: "addSearchResults", payload: null});
+    SearchDispatcher({type: "addSearchQuery", payload: {keywords: queryString}});
 
     const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
       PREFIX dbo: <http://dbpedia.org/ontology/>
@@ -61,17 +61,17 @@ const Home:React.FC<Props> = (props) => {
         FILTER(LANGMATCHES(LANG(?producer_name), "en"))
         FILTER(LANGMATCHES(LANG(?abstract), "en"))
       }
-      LIMIT 5
+      LIMIT 20
     `
-    await axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
+    axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
       .then(response => {
-        SearchDispatcher({type: "addSearchQuery", payload: {keywords: queryString}});
         SearchDispatcher({type: "addSearchResults", payload: response.data});
-        history.push(`/search?query=${encodeURIComponent(query)}`)
+        SearchDispatcher({type: "addSearchQuery", payload: {keywords: queryString}});
       })
       .catch(error => {
         console.log("<<<<<<<<<< Error: ", error);
       });
+    history.push(`/search?query=${encodeURIComponent(query)}`)
   }
 
   const handleMouseDownPassword = (event: any) => {

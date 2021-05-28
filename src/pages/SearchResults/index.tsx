@@ -9,6 +9,8 @@ import SearchIcon from "@material-ui/icons/SearchOutlined";
 import InputAdornment from "@material-ui/core/InputAdornment";
 
 import Page from '../../layouts/Page';
+import { CircularProgress, Grid } from '@material-ui/core';
+import SingleMovieCard from '../../components/SingleMovieCard';
 
 interface Props {
 
@@ -16,13 +18,17 @@ interface Props {
 
 const SearchResults:React.FC<Props> = (props) => {
 
-  const [ queryString, setQueryString ] = React.useState<string>("");
-
+  
   const { SearchState } = React.useContext(AppStateContext)
   const { SearchDispatcher } = React.useContext(DispatchContext)
+  
+  const [ queryString, setQueryString ] = React.useState<string>(SearchState.query?.keywords ? SearchState.query.keywords : "");
 
-  console.log("Search: ", SearchState);
+  console.log("SearchState: ", SearchState);
+  console.log("queryString: ", queryString);
   const handleSearch = async () => {
+
+    SearchDispatcher({type: "addSearchResults", payload: null});
 
     const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
       PREFIX dbo: <http://dbpedia.org/ontology/>
@@ -57,7 +63,7 @@ const SearchResults:React.FC<Props> = (props) => {
         FILTER(LANGMATCHES(LANG(?producer_name), "en"))
         FILTER(LANGMATCHES(LANG(?abstract), "en"))
       }
-      LIMIT 5
+      LIMIT 20
     `
     await axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
       .then(response => {
@@ -75,29 +81,70 @@ const SearchResults:React.FC<Props> = (props) => {
 
   return (
     <Page>
-      <div style={{maxWidth: "600px", width: "100%"}}>
-        <FormControl fullWidth >
-          <TextField
-            autoFocus
-            fullWidth
-            variant="outlined"
-            placeholder="Search movies information..."
-            onChange={(event) => {setQueryString(event.target.value)}}
-            InputProps={{
-              style: {
-                borderRadius: "35px",
-              },
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton edge="end" aria-label="toggle password visibility" onClick={handleSearch} onMouseDown={handleMouseDownPassword}>
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
+      <Grid container>
+        <Grid item xs={12} sm={12} md={9} lg={7} xl={6}>
+          <div style={{width: "100%"}}>
+            <FormControl fullWidth >
+              <TextField
+                autoFocus
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                value={queryString}
+                placeholder="Search movies information..."
+                onChange={(event) => {setQueryString(event.target.value)}}
+                InputProps={{
+                  style: {
+                    borderRadius: "25px",
+                  },
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton edge="end" aria-label="toggle password visibility" onClick={handleSearch} onMouseDown={handleMouseDownPassword}>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </FormControl>
+          </div>
+          <div style={{marginTop: "20px"}}>
+
+          </div>
+          {
+            SearchState.results
+            ?
+            (
+              SearchState.results.results?.bindings?.length > 0 
+              ?
+              (
+                <div>
+                  {
+                    SearchState.results.results?.bindings?.map((item: any) => {
+                      return (
+                        <SingleMovieCard movie={item} key={Math.random()} />
+                      )
+                    })
+                  }
+                </div>
               )
-            }}
-          />
-        </FormControl>
-      </div>
+              :
+              (
+                <div>
+                  No movies match your query
+                </div>
+              )
+            )
+            :
+            (
+              <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                <CircularProgress />
+              </div>
+            )
+          }
+        </Grid>
+      </Grid>
+      
     </Page>
   );
 };

@@ -9,7 +9,7 @@ function addSearchResults(draft: any, payload: any) {
 }
 
 function addSearchQuery(draft: any, payload: any) {
-  draft.query = {...draft.query, payload}
+  draft.query = {...draft.query, ...payload}
   return draft
 }
 
