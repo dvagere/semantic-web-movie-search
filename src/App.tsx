@@ -15,6 +15,8 @@ import Home from './pages/Home';
 import SearchResults from './pages/SearchResults';
 
 import theme from './assets/jss/theme';
+import AdvancedSearch from './pages/AdvancedSearch';
+import SingleMovieDetails from './pages/SingleMovieDetails';
 
 function App() {
 
@@ -35,6 +37,8 @@ function App() {
               <Switch>
                 <Route path="/" component={Home} exact />
                 <Route path="/search" component={SearchResults} exact />
+                <Route path="/movie/:id" component={SingleMovieDetails} exact />
+                <Route path="/search/advanced" component={AdvancedSearch} exact />
               </Switch>
             </BrowserRouter>
           </MuiThemeProvider>

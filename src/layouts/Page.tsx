@@ -6,9 +6,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   content: {
-    margin: "40px 50px",
+    padding: "40px 50px",
     [theme.breakpoints.down("sm")]: {
-      margin: "15px 15px"
+      padding: "15px 15px"
     }
   },
 }));

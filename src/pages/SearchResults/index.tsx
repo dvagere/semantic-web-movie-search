@@ -1,15 +1,17 @@
 import React from 'react';
 import axios from 'axios';
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import FormControl from "@material-ui/core/FormControl";
-import AppStateContext from '../../ContextApi/AppStateContext';
-import DispatchContext from '../../ContextApi/DispatchContext';
 import SearchIcon from "@material-ui/icons/SearchOutlined";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import AppStateContext from '../../ContextApi/AppStateContext';
+import DispatchContext from '../../ContextApi/DispatchContext';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import Page from '../../layouts/Page';
-import { CircularProgress, Grid } from '@material-ui/core';
 import SingleMovieCard from '../../components/SingleMovieCard';
 
 interface Props {
@@ -24,8 +26,6 @@ const SearchResults:React.FC<Props> = (props) => {
   
   const [ queryString, setQueryString ] = React.useState<string>(SearchState.query?.keywords ? SearchState.query.keywords : "");
 
-  console.log("SearchState: ", SearchState);
-  console.log("queryString: ", queryString);
   const handleSearch = async () => {
 
     SearchDispatcher({type: "addSearchResults", payload: null});
@@ -93,6 +93,12 @@ const SearchResults:React.FC<Props> = (props) => {
                 value={queryString}
                 placeholder="Search movies information..."
                 onChange={(event) => {setQueryString(event.target.value)}}
+                onKeyPress={(event) => {
+                  if(event.key === "Enter"){
+                    event.preventDefault();
+                    handleSearch()
+                  }
+                }}
                 InputProps={{
                   style: {
                     borderRadius: "25px",
@@ -108,9 +114,9 @@ const SearchResults:React.FC<Props> = (props) => {
               />
             </FormControl>
           </div>
-          <div style={{marginTop: "20px"}}>
-
-          </div>
+          <Button href="/search/advanced" style={{marginTop: "10px", marginBottom: "5px"}} color="secondary">
+            Advanced Search
+          </Button>
           {
             SearchState.results
             ?

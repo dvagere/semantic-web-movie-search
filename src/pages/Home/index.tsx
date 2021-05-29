@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router';
 
+import Page from '../../layouts/Page';
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
@@ -9,8 +11,6 @@ import FormControl from "@material-ui/core/FormControl";
 import SearchIcon from "@material-ui/icons/SearchOutlined";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import DispatchContext from '../../ContextApi/DispatchContext';
-import { useHistory } from 'react-router';
-import Page from '../../layouts/Page';
 
 interface Props {
 
@@ -87,9 +87,16 @@ const Home:React.FC<Props> = (props) => {
             <TextField
               autoFocus
               fullWidth
+              margin="dense"
               variant="outlined"
               placeholder="Search movies information..."
               onChange={(event) => {setQueryString(event.target.value)}}
+              onKeyPress={(ev) => {
+                if(ev.key === "Enter"){
+                  ev.preventDefault()
+                  handleSearch()
+                }
+              }}
               InputProps={{
                 style: {
                   borderRadius: "35px",
@@ -106,8 +113,8 @@ const Home:React.FC<Props> = (props) => {
           </FormControl>
         </div>
         <Button
-          color="primary"
-          // variant="outlined"
+          href="/search/advanced"
+          color="secondary"
           style={{marginTop: "10px"}}
         >
           Advanced Search
