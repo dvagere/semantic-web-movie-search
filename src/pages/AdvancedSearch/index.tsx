@@ -58,7 +58,7 @@ const AdvancedSearch: React.FC<Props> = (props) => {
       PREFIX dbo: <http://dbpedia.org/ontology/>
       PREFIX dbp: <http://dbpedia.org/ontology/>
       PREFIX dbt: <http://dbpedia.org/ontology/>
-      SELECT DISTINCT ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
+      SELECT DISTINCT ?x, ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
       WHERE {
         {
           ?x rdf:type dbpediaOnto:Film.
@@ -134,7 +134,7 @@ const AdvancedSearch: React.FC<Props> = (props) => {
                   margin="dense"
                   label="Date from"
                   inputVariant="outlined"
-                  format="dd/MM/yyyy"
+                  format="yyyy"
                   value={queryValues?.date_from || null}
                   onChange={handleDateChange('date_from')}
                   KeyboardButtonProps={{
@@ -150,7 +150,7 @@ const AdvancedSearch: React.FC<Props> = (props) => {
                   margin="dense"
                   label="Date to"
                   inputVariant="outlined"
-                  format="dd/MM/yyyy"
+                  format="yyyy"
                   value={queryValues?.date_to || null}
                   onChange={handleDateChange('date_to')}
                   KeyboardButtonProps={{
