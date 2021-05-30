@@ -13,6 +13,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import Page from '../../layouts/Page';
 import SingleMovieCard from '../../components/SingleMovieCard';
+import { generateKeywordsQuery } from '../../utils/query';
 
 interface Props {
 
@@ -20,63 +21,64 @@ interface Props {
 
 const SearchResults:React.FC<Props> = (props) => {
 
-  
   const { SearchState } = React.useContext(AppStateContext)
   const { SearchDispatcher } = React.useContext(DispatchContext)
+
+  const [loading, setLoading] = React.useState(SearchState.query?.keywords ? true : false);
   
   const [ queryString, setQueryString ] = React.useState<string>(SearchState.query?.keywords ? SearchState.query.keywords : "");
 
-  const handleSearch = async () => {
+  const [page, setPage] = React.useState(1);
+  const [lastPageReached, setLastPageReached] = React.useState(false);
+
+  const handleSearch = async (offsetting?: number) => {
+
+    setLoading(true)
 
     SearchDispatcher({type: "addSearchResults", payload: null});
 
-    const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
-      PREFIX dbo: <http://dbpedia.org/ontology/>
-      PREFIX dbp: <http://dbpedia.org/ontology/>
-      PREFIX dbt: <http://dbpedia.org/ontology/>
-      SELECT DISTINCT ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
-      WHERE {
-        {
-          ?x rdf:type dbpediaOnto:Film.
-          ?x rdfs:label ?label.
-          ?x dbo:abstract ?abstract;
-              dbo:thumbnail ?thumbnail;
-              dbo:runtime ?runtime;
-              dbo:producer ?producer;
-              dbp:writer ?writer.
-          ?producer rdfs:label ?producer_name.
-        }
+    let offset = 0;
 
-        UNION
-        {
-          ?x rdf:type dbpediaOnto:Movie.
-          ?x rdfs:label ?label.
-          ?x dbo:abstract ?abstract;
-              dbo:thumbnail ?thumbnail;
-              dbo:runtime ?runtime;
-              dbo:producer ?producer;
-              dbp:writer ?writer.
-          ?producer rdfs:label ?producer_name.
-        }
-        FILTER( REGEX(STR(?label),"${queryString}") )
-        FILTER(LANGMATCHES(LANG(?label), "en"))
-        FILTER(LANGMATCHES(LANG(?producer_name), "en"))
-        FILTER(LANGMATCHES(LANG(?abstract), "en"))
+    if(offsetting){
+      let currPage = page;
+      if(offsetting < 0){
+        currPage = currPage - 1
       }
-      LIMIT 20
-    `
+
+      offset = currPage * (SearchState.results?.results?.bindings ? SearchState.results?.results?.bindings.length : 0)
+    }
+
+    console.log("Offset: ", offsetting)
+    
+    const query = generateKeywordsQuery(queryString, offset);
+
     await axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
       .then(response => {
         SearchDispatcher({type: "addSearchQuery", payload: {keywords: queryString}});
         SearchDispatcher({type: "addSearchResults", payload: response.data});
+        if(response.data.results?.bindings?.length < 25){
+          setLastPageReached(true);
+        }
       })
       .catch(error => {
         console.log("<<<<<<<<<< Error: ", error);
       });
+
+      setLoading(false)
   }
 
   const handleMouseDownPassword = (event: any) => {
     event.preventDefault()
+  }
+
+  const handleNextPage = async () => {
+    await handleSearch(1)
+    setPage(page + 1);
+  }
+
+  const handlePrevPage = async () => {
+    await handleSearch(-1)
+    setPage(page - 1);
   }
 
   return (
@@ -96,6 +98,9 @@ const SearchResults:React.FC<Props> = (props) => {
                 onKeyPress={(event) => {
                   if(event.key === "Enter"){
                     event.preventDefault();
+                    if(lastPageReached){
+                      setLastPageReached(false)
+                    }
                     handleSearch()
                   }
                 }}
@@ -105,7 +110,17 @@ const SearchResults:React.FC<Props> = (props) => {
                   },
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton edge="end" aria-label="toggle password visibility" onClick={handleSearch} onMouseDown={handleMouseDownPassword}>
+                      <IconButton 
+                        edge="end" 
+                        aria-label="toggle password visibility" 
+                        onClick={() => {
+                            if(lastPageReached){
+                              setLastPageReached(false)
+                            }
+                            handleSearch()
+                          }
+                        } 
+                        onMouseDown={handleMouseDownPassword}>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -118,31 +133,68 @@ const SearchResults:React.FC<Props> = (props) => {
             Advanced Search
           </Button>
           {
-            SearchState.results
+            !loading
             ?
             (
-              SearchState.results.results?.bindings?.length > 0 
+              SearchState.results
               ?
               (
-                <div>
-                  {
-                    SearchState.results.results?.bindings?.map((item: any) => {
-                      return (
-                        <SingleMovieCard movie={item} key={Math.random()} />
-                      )
-                    })
-                  }
-                </div>
+                SearchState.results.results?.bindings?.length > 0 
+                ?
+                (
+                  <div>
+                    {
+                      SearchState.results.results?.bindings?.map((item: any) => {
+                        return (
+                          <SingleMovieCard movie={item} key={Math.random()} />
+                        )
+                      })
+                    }
+                    <div>
+                      {
+                        page !== 1
+                        ?
+                        (
+                          <Button onClick={handlePrevPage}>
+                            Prev
+                          </Button>
+                        )
+                        :
+                        (
+                          null
+                        )
+                      }
+                      {
+                        !lastPageReached
+                        ?
+                        (
+                          <Button onClick={handleNextPage}>
+                            Next
+                          </Button>
+                        )
+                        :
+                        (
+                          null
+                        )
+                      }
+                    </div>
+                  </div>
+                )
+                :
+                (
+                  <div>
+                    No movies match your query
+                  </div>
+                )
               )
               :
               (
-                <div>
-                  No movies match your query
-                </div>
+                null
               )
             )
             :
             (
+
               <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
                 <CircularProgress />
               </div>

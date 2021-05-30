@@ -21,6 +21,7 @@ import {
 import DateFnsUtils from '@date-io/date-fns';
 
 import SingleMovieCard from '../../components/SingleMovieCard';
+import { generateQuery } from '../../utils/query';
 
 interface Props {
 
@@ -54,42 +55,7 @@ const AdvancedSearch: React.FC<Props> = (props) => {
 
   const onSubmit = async () => {
     setLoading(true)
-    const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
-      PREFIX dbo: <http://dbpedia.org/ontology/>
-      PREFIX dbp: <http://dbpedia.org/ontology/>
-      PREFIX dbt: <http://dbpedia.org/ontology/>
-      SELECT DISTINCT ?x, ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
-      WHERE {
-        {
-          ?x rdf:type dbpediaOnto:Film.
-          ?x rdfs:label ?label.
-          ?x dbo:abstract ?abstract;
-              dbo:thumbnail ?thumbnail;
-              dbo:runtime ?runtime;
-              dbo:producer ?producer;
-              dbp:writer ?writer.
-          ?producer rdfs:label ?producer_name.
-        }
-
-        UNION
-        {
-          ?x rdf:type dbpediaOnto:Movie.
-          ?x rdfs:label ?label.
-          ?x dbo:abstract ?abstract;
-              dbo:thumbnail ?thumbnail;
-              dbo:runtime ?runtime;
-              dbo:producer ?producer;
-              dbp:writer ?writer.
-          ?producer rdfs:label ?producer_name.
-        }
-        FILTER( REGEX(STR(?label),"${queryValues.keywords || ""}") )
-        FILTER(LANGMATCHES(LANG(?label), "en"))
-        FILTER(LANGMATCHES(LANG(?producer_name), "en"))
-        FILTER(LANGMATCHES(LANG(?abstract), "en"))
-      }
-      ORDER BY ${queryValues.sort_direction || "ASC"} (?${queryValues.sort_by || 'label'})
-      LIMIT ${queryValues.limit || 25}
-    `
+    const query = generateQuery(queryValues)
     await axios.get(`${process.env.REACT_APP_DBPEDIA_URL}/sparql/?query=${encodeURIComponent(query)}`, {headers: {Accept: 'application/json'}})
       .then(response => {
         SearchDispatcher({type: "addSearchQuery", payload: {...queryValues}});
