@@ -4,7 +4,7 @@ export const generateQuery = (data: any) => {
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/ontology/>
   PREFIX dbt: <http://dbpedia.org/ontology/>
-  SELECT DISTINCT ?x, ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
+  SELECT DISTINCT ?x, ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer, ?releaseDate
   WHERE {
     {
       ?x rdf:type dbpediaOnto:Film.

@@ -1,6 +1,8 @@
 import { Avatar, ListItem, ListItemAvatar, ListItemText, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core";
 import React from "react";
+import { useHistory } from "react-router";
+import DispatchContext from "../ContextApi/DispatchContext";
 
 interface Props {
   movie: any;
@@ -42,9 +44,17 @@ const SingleMovieCard: React.FC<Props> = ({movie}) => {
 
   const classes = useStyles();
 
+  const history = useHistory();
+  const {SearchDispatcher} = React.useContext(DispatchContext);
+
+  const handleClick = () => {
+    SearchDispatcher({type: "addSingleMovie", payload: movie})
+    history.push("/movie/single")
+  }
+
   return (
     <React.Fragment>
-      <ListItem alignItems="center" className={classes.listitem}>
+      <ListItem alignItems="center" className={classes.listitem} onClick={handleClick}>
         <ListItemAvatar className={classes.listItemAvatar}>
           <Avatar className={classes.avatar} src={movie.thumbnail.value} variant="rounded" />
         </ListItemAvatar>
@@ -54,7 +64,7 @@ const SingleMovieCard: React.FC<Props> = ({movie}) => {
             <React.Fragment>
               <Typography
                 component="span"
-                variant="h5"
+                variant="h6"
               >
                 {movie.label.value}
               </Typography>
@@ -69,6 +79,13 @@ const SingleMovieCard: React.FC<Props> = ({movie}) => {
                 className={classes.description}
               >
                 {movie.abstract.value}
+              </Typography>
+              <Typography
+                variant="body2"
+                component="span"
+                color="textSecondary"
+              >
+                {movie.releaseDate.value}
               </Typography>
             </React.Fragment>
           }

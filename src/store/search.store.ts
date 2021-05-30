@@ -1,6 +1,12 @@
 const initialSearchState = {
   results: null,
+  movie: null,
   query: {}
+}
+
+function addSingleMovie(draft: any, payload: any) {
+  draft.movie = payload
+  return draft;
 }
 
 function addSearchResults(draft: any, payload: any) {
@@ -37,6 +43,7 @@ function SearchReducer(draft: any, action: any) {
   const actions: any = {
     resetState: () => resetState(draft),
     addSearchQuery: () => addSearchQuery(draft, action.payload),
+    addSingleMovie: () => addSingleMovie(draft, action.payload),
     addSearchResults: () => addSearchResults(draft, action.payload),
     addSearchResultsOffset: () => addSearchResultsOffset(draft, action.payload),
   }

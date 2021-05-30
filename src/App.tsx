@@ -37,6 +37,7 @@ function App() {
               <Switch>
                 <Route path="/" component={Home} exact />
                 <Route path="/search" component={SearchResults} exact />
+                <Route path="/movie/single" component={SingleMovieDetails} exact />
                 <Route path="/movie/:id" component={SingleMovieDetails} exact />
                 <Route path="/search/advanced" component={AdvancedSearch} exact />
               </Switch>

@@ -56,6 +56,8 @@ const AdvancedSearch: React.FC<Props> = (props) => {
     setQueryValues({...queryValues, [name]: event})
   }
 
+  console.log(">>>", SearchState)
+
   const onSubmit = async (offsetting?: number) => {
     setLoading(true)
 
