@@ -1,5 +1,6 @@
 export const generateQuery = (data: any) => {
-  return `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
+  console.log("Data, :", data)
+  const query = `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/ontology/>
   PREFIX dbt: <http://dbpedia.org/ontology/>
@@ -33,10 +34,14 @@ export const generateQuery = (data: any) => {
     FILTER(LANGMATCHES(LANG(?label), "en"))
     FILTER(LANGMATCHES(LANG(?producer_name), "en"))
     FILTER(LANGMATCHES(LANG(?abstract), "en"))
+    ${data.date_from ? `FILTER(?releaseDate >= xsd:date("${data.date_from}"))` : ""}
+    ${data.date_to ? `FILTER(?releaseDate < xsd:date("${data.date_to}"))` : ""}
   }
   ORDER BY ${data.sort_direction || "ASC"} (?${data.sort_by || 'label'})
   LIMIT ${data.limit || 25}
   OFFSET ${data.offset || 0}`
+  console.log("Query: ", query);
+  return query
 }
 
 export const generateKeywordsQuery = (keywords: string, offset?: any) => {
