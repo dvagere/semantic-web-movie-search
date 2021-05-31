@@ -85,7 +85,7 @@ const SingleMovieCard: React.FC<Props> = ({movie}) => {
                 component="span"
                 color="textSecondary"
               >
-                {movie.releaseDate.value}
+                {movie.releaseDate?.value}
               </Typography>
             </React.Fragment>
           }

@@ -13,8 +13,8 @@ export const generateQuery = (data: any) => {
           dbo:thumbnail ?thumbnail;
           dbo:runtime ?runtime;
           dbo:producer ?producer;
-          dbp:writer ?writer;
-          dbp:releaseDate ?releaseDate.
+          dbp:writer ?writer.
+      OPTIONAL {?x  dbp:releaseDate ?releaseDate} .
       ?producer rdfs:label ?producer_name.
     }
   
@@ -26,8 +26,8 @@ export const generateQuery = (data: any) => {
           dbo:thumbnail ?thumbnail;
           dbo:runtime ?runtime;
           dbo:producer ?producer;
-          dbp:writer ?writer;
-          dbp:releaseDate ?releaseDate.
+          dbp:writer ?writer.
+      OPTIONAL {?x  dbp:releaseDate ?releaseDate} .
       ?producer rdfs:label ?producer_name.
     }
     FILTER( REGEX(STR(?label),"${data.keywords || ""}") )
@@ -45,7 +45,7 @@ export const generateQuery = (data: any) => {
 }
 
 export const generateKeywordsQuery = (keywords: string, offset?: any) => {
-  return `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
+  const query =  `PREFIX dbpediaOnto: <http://dbpedia.org/ontology/>
     PREFIX dbo: <http://dbpedia.org/ontology/>
     PREFIX dbp: <http://dbpedia.org/ontology/>
     PREFIX dbt: <http://dbpedia.org/ontology/>
@@ -58,8 +58,8 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
             dbo:thumbnail ?thumbnail;
             dbo:runtime ?runtime;
             dbo:producer ?producer;
-            dbp:writer ?writer;
-            dbp:releaseDate ?releaseDate.
+            dbp:writer ?writer.
+        OPTIONAL {?x  dbp:releaseDate ?releaseDate} .
         ?producer rdfs:label ?producer_name.
       }
 
@@ -71,8 +71,8 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
             dbo:thumbnail ?thumbnail;
             dbo:runtime ?runtime;
             dbo:producer ?producer;
-            dbp:writer ?writer;
-            dbp:releaseDate ?releaseDate.
+            dbp:writer ?writer.
+        OPTIONAL {?x  dbp:releaseDate ?releaseDate} .
         ?producer rdfs:label ?producer_name.
       }
       FILTER( REGEX(STR(?label),"${keywords}") )
@@ -83,4 +83,7 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
     LIMIT 25
     OFFSET ${offset || 0}
   `
+
+  console.log("Data: ", query)
+  return query
 }

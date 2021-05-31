@@ -24,7 +24,7 @@ const SearchResults:React.FC<Props> = (props) => {
   const { SearchState } = React.useContext(AppStateContext)
   const { SearchDispatcher } = React.useContext(DispatchContext)
 
-  const [loading, setLoading] = React.useState(SearchState.query?.keywords ? true : false);
+  const [loading, setLoading] = React.useState(false);
   
   const [ queryString, setQueryString ] = React.useState<string>(SearchState.query?.keywords ? SearchState.query.keywords : "");
 
@@ -47,8 +47,6 @@ const SearchResults:React.FC<Props> = (props) => {
 
       offset = currPage * (SearchState.results?.results?.bindings ? SearchState.results?.results?.bindings.length : 0)
     }
-
-    console.log("Offset: ", offsetting)
     
     const query = generateKeywordsQuery(queryString, offset);
 
@@ -130,7 +128,7 @@ const SearchResults:React.FC<Props> = (props) => {
             </FormControl>
           </div>
           <Button href="/search/advanced" style={{marginTop: "10px", marginBottom: "5px"}} color="secondary">
-            Advanced Search
+            Go to Advanced Search
           </Button>
           {
             !loading
@@ -189,7 +187,9 @@ const SearchResults:React.FC<Props> = (props) => {
               )
               :
               (
-                null
+                <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                  <CircularProgress />
+                </div>
               )
             )
             :
