@@ -49,7 +49,7 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
     PREFIX dbo: <http://dbpedia.org/ontology/>
     PREFIX dbp: <http://dbpedia.org/ontology/>
     PREFIX dbt: <http://dbpedia.org/ontology/>
-    SELECT DISTINCT ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer
+    SELECT DISTINCT ?x, ?label, ?abstract, ?thumbnail, ?runtime, ?producer, ?producer_name, ?writer, ?releaseDate
     WHERE {
       {
         ?x rdf:type dbpediaOnto:Film.
@@ -58,7 +58,8 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
             dbo:thumbnail ?thumbnail;
             dbo:runtime ?runtime;
             dbo:producer ?producer;
-            dbp:writer ?writer.
+            dbp:writer ?writer;
+            dbp:releaseDate ?releaseDate.
         ?producer rdfs:label ?producer_name.
       }
 
@@ -70,7 +71,8 @@ export const generateKeywordsQuery = (keywords: string, offset?: any) => {
             dbo:thumbnail ?thumbnail;
             dbo:runtime ?runtime;
             dbo:producer ?producer;
-            dbp:writer ?writer.
+            dbp:writer ?writer;
+            dbp:releaseDate ?releaseDate.
         ?producer rdfs:label ?producer_name.
       }
       FILTER( REGEX(STR(?label),"${keywords}") )
