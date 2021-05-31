@@ -36,47 +36,47 @@ const SingleMovieDetails: React.FC<Props> = (props) => {
         :
         (
           <div style={{display: "flex", flexDirection: "column", width: "60%", alignItems: "center"}}>
-            <Avatar className={classes.avatar} src={movie.thumbnail.value} variant="rounded" />
+            <Avatar className={classes.avatar} src={movie.thumbnail?.value} variant="rounded" />
             <Typography
               component="span"
               variant="h6"
             >
-              {movie.label.value}
+              {movie.label?.value}
             </Typography>
             <Typography
               variant="body1"
               component="span"
               color="textSecondary"
             >
-              {movie.releaseDate.value}
+              {movie.releaseDate?.value}
             </Typography>
             <Typography
               variant="body1"
               component="span"
               color="textSecondary"
             >
-              {movie.runtime.value}
+              {movie.runtime?.value}
             </Typography>
             <Typography
               variant="body1"
               component="span"
               color="textSecondary"
             >
-              {movie.producer_name.value}
+              {movie.producer_name?.value}
             </Typography>
             <Typography
               variant="body2"
               component="span"
               color="textSecondary"
             >
-              {movie.writer.value}
+              {movie.writer?.value}
             </Typography>
             <Typography
               variant="body2"
               component="span"
               color="textPrimary"
             >
-              {movie.abstract.value}
+              {movie.abstract?.value}
             </Typography>
           </div>
         )

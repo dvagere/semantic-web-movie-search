@@ -188,7 +188,7 @@ const SearchResults:React.FC<Props> = (props) => {
               :
               (
                 <div style={{display: "flex", justifyContent: "center", width: "100%"}}>
-                  <CircularProgress />
+                  Your search results will appear here.
                 </div>
               )
             )
